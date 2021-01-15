@@ -1,0 +1,5 @@
+id	filename	md5	size	state
+2296555d-7cfd-4b8b-8c49-ec8ec6f08d52	TCGA-OV.2ea95bbb-00cd-491e-814e-25360d715683.gene_level_copy_number.tsv	b8cd8024c663c8a4025712a971221197	3482433	released
+8584e480-ff4b-4434-b253-1b2b71b1a385	TCGA-OV.c7485ff7-5733-441c-8496-c28f0056e5b3.gene_level_copy_number.tsv	e1ac277540025e0a93c884a29b54fc6b	3482104	released
+7b237f7a-8cd5-4cc9-b339-ecbd3717c86e	TCGA-OV.9f90944b-ee3c-4f43-93b1-e2bf5829a325.gene_level_copy_number.tsv	8e05c0575a22556205d0d6ba89f62739	3483783	released
+40648588-21ab-4fe1-a553-a050d4bfe029	TCGA-OV.1f1208d3-3643-4854-96c4-987e0d1068fd.gene_level_copy_number.tsv	e90ccbe67006ac500f655cca452243fe	3482245	released
