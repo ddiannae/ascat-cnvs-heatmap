@@ -3,6 +3,8 @@ data/raw/*
 .snakemake/
 .snakemake/*
 packrat/lib*/
+packrat/src/
+packrat/src/*
 .Rhistory
 .Rprofile
 *~
