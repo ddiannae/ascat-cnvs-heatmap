@@ -1,10 +1,21 @@
 import requests
 import json
+import sys
 import pandas as pd
 from io import StringIO
 
-primary_site = "Breast"
-sample_type = "Primary Tumor"
+primary_site = sys.argv[1]
+sample_type = sys.argv[2]
+sst = sample_type
+
+if (sample_type == "tumor"):
+    sample_type = "primary tumor"
+elif (sample_type == "normal"):
+    sample_type = "solid tissue normal"
+else:
+    sys.exit("Incorrect sample type")
+
+print("Getting data for: " + primary_site + ", " + sample_type)
 
 # Fields for the query
 fields = [
@@ -90,8 +101,7 @@ df = pd.merge(df_ascat, df_rna, "inner", on="cases.0.case_id",
         suffixes=("_ascat", "_rna"))
 
 # Save file ids and file names just in case
-df.to_csv("../data/" + "-".join([primary_site.lower(), sample_type.replace(" ",
-    "_").lower()]) + "-files.tsv", sep="\t", index=False)  
+df.to_csv("data/" + "-".join([primary_site.lower(), sst.lower()]) + "-files.tsv", sep="\t", index=False)  
 
 # Getting RNASeq files manifest for future download
 params = { "ids" : df["id_rna"].tolist() }
@@ -100,8 +110,8 @@ response = requests.post(manifest_endpt, data= json.dumps(params), headers = {"C
 
 print("Got RNASeq manifest")
 
-f = open("../data/manifests/" + "-".join([primary_site.lower(),
-    sample_type.replace(" ", "_").lower(), "rna_counts.txt"]), "w")
+f = open("data/manifests/" + "-".join([primary_site.lower(),
+    sst.lower(), "rna_counts.txt"]), "w")
 f.write(response.content.decode("utf-8"))
 f.close()
 
@@ -114,8 +124,8 @@ response = requests.post(manifest_endpt, data= json.dumps(params), headers = {"C
 
 print("Got ASCAT2 manifest")
 
-f = open("../data/manifests/" + "-".join([primary_site.lower(),
-    sample_type.replace(" ", "_").lower(), "ascat.txt"]), "w")
+f = open("data/manifests/" + "-".join([primary_site.lower(),
+    sst.lower(), "ascat.txt"]), "w")
 f.write(response.content.decode("utf-8"))
 f.close()
 
