@@ -1,0 +1,132 @@
+PackratFormat: 1.4
+PackratVersion: 0.5.0
+RVersion: 3.6.3
+Repos: CRAN=https://cran.rstudio.com/
+
+Package: BH
+Source: CRAN
+Version: 1.75.0-0
+
+Package: R6
+Source: CRAN
+Version: 2.5.0
+
+Package: assertthat
+Source: CRAN
+Version: 0.2.1
+
+Package: cli
+Source: CRAN
+Version: 2.2.0
+Requires: assertthat, crayon, fansi, glue
+
+Package: clipr
+Source: CRAN
+Version: 0.7.1
+
+Package: cpp11
+Source: CRAN
+Version: 0.2.5
+
+Package: crayon
+Source: CRAN
+Version: 1.3.4
+
+Package: digest
+Source: CRAN
+Version: 0.6.27
+
+Package: dplyr
+Source: CRAN
+Version: 1.0.3
+Requires: R6, ellipsis, generics, glue, lifecycle, magrittr, rlang,
+    tibble, tidyselect, vctrs
+
+Package: ellipsis
+Source: CRAN
+Version: 0.3.1
+Requires: rlang
+
+Package: fansi
+Source: CRAN
+Version: 0.4.2
+
+Package: generics
+Source: CRAN
+Version: 0.1.0
+
+Package: glue
+Source: CRAN
+Version: 1.4.2
+
+Package: hms
+Source: CRAN
+Version: 1.0.0
+Requires: ellipsis, lifecycle, pkgconfig, rlang, vctrs
+
+Package: lifecycle
+Source: CRAN
+Version: 0.2.0
+Requires: glue, rlang
+
+Package: magrittr
+Source: CRAN
+Version: 2.0.1
+
+Package: packrat
+Source: CRAN
+Version: 0.5.0
+Hash: 498643e765d1442ba7b1160a1df3abf9
+
+Package: pillar
+Source: CRAN
+Version: 1.4.7
+Requires: cli, crayon, ellipsis, fansi, lifecycle, rlang, utf8, vctrs
+
+Package: pkgconfig
+Source: CRAN
+Version: 2.0.3
+
+Package: purrr
+Source: CRAN
+Version: 0.3.4
+Requires: magrittr, rlang
+
+Package: readr
+Source: CRAN
+Version: 1.4.0
+Requires: BH, R6, cli, clipr, cpp11, crayon, hms, lifecycle, rlang,
+    tibble
+
+Package: rlang
+Source: CRAN
+Version: 0.4.10
+
+Package: stringi
+Source: CRAN
+Version: 1.5.3
+
+Package: stringr
+Source: CRAN
+Version: 1.4.0
+Requires: glue, magrittr, stringi
+
+Package: tibble
+Source: CRAN
+Version: 3.0.5
+Requires: cli, crayon, ellipsis, fansi, lifecycle, magrittr, pillar,
+    pkgconfig, rlang, vctrs
+
+Package: tidyselect
+Source: CRAN
+Version: 1.1.0
+Requires: ellipsis, glue, purrr, rlang, vctrs
+
+Package: utf8
+Source: CRAN
+Version: 1.1.4
+
+Package: vctrs
+Source: CRAN
+Version: 0.3.6
+Requires: digest, ellipsis, glue, rlang
