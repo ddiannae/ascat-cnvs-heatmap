@@ -1,43 +1,54 @@
-import pandas as pd
- 
-# Tissue type just like in GDC, lowercase is fine
+## Snakefile for ASCAT2 files from GDC
+##
+## Tissue type just like in GDC, lowercase is fine
 TISSUE = "breast"
-TTYPES = ["normal", "tumor"]
-FTYPES = ["ascat", "rna_counts"]
-MDIR = "data/manifests/"
-#  manifests_files.append("data/" + "-".join([tissue, tt, "files"]) + ".tsv")
+## Only tumor samples for the ascat pipeline. It takes normal and tumor for 
+## comparison, so there are no normal samples.
+TTYPE = "tumor"
+## The RNA files are added so that we get cases that include
+## both files
+DATADIR = "data/"+TISSUE
+FIGDIR = "figures/"+TISSUE
+MDIR = DATADIR+"/manifests"
+RAWDIR = DATADIR+"/raw"
+biomart = "data/Biomart_Ensembl102_GRCh38_p13.txt"
 
-#def get_raw_filenames(manifest):
-#  mani = pd.read_csv(manifest, sep="\t")
-#  rawfolder = manifest.split("/")[2].replace(".txt", "")
-#  file_dirs = mani.apply(lambda x: "data/raw/" + rawfolder + "/" + x["id"] + "/" + x["filename"],
-#        axis=1) 
-#  return(file_dirs.tolist())
-
-rule all:
-  input:
-    expand("data/{tissue}-{tt}-ascat-{ft}.tsv", tissue=TISSUE, tt=TTYPES[0], ft=["files", "matrix"])
-
-rule get_ascat_matrix:
-  input: directory("data/raw/"+TISSUE+"-"+TTYPES[0]+"-ascat") 
+rule get_heatmap:
+  input: 
+    DATADIR+"/"+TISSUE+"-"+TTYPE+"-ascat-matrix.tsv"
   output:
-    expand("data/{tissue}-{tt}-ascat-{ft}.tsv", tissue=TISSUE, tt=TTYPES[0], ft=["files", "matrix"])
+    FIGDIR+"/"+TISSUE+"-ascat-heatmap.png"
   shell:
-    "Rscript src/getMatrix.R {TISSUE} {TTYPES[0]}"
+    """
+    mkdir -p {FIGDIR}
+    Rscript src/getHeatmap.R {TISSUE} {biomart} {input} {FIGDIR}
+    """
 
-rule download_files:
-  input: expand(MDIR + "{tissue}-{tt}-ascat.txt", tissue=TISSUE, tt=TTYPES[0])
-  output: directory("data/raw/"+TISSUE+"-"+TTYPES[0]+"-ascat") 
+## We need to run these two together because the output of the download_files
+## tasks depends on the manifest and there is no easy way to specify this on 
+## snakemake
+rule download_files_and_get_ascat_matrix:
+  input:
+    ## Manifest file
+    MDIR+"/"+TISSUE+"-"+TTYPE+"-ascat.txt",
+  output: 
+    expand(DATADIR+"/"+TISSUE+"-"+TTYPE+"-ascat-{ft}.tsv", ft=["files", "matrix"])
   shell:
-    "mkdir -p data/raw/{TISSUE}-{TTYPES[0]}-ascat ; ./bin/gdc-client download -d data/raw/{TISSUE}-{TTYPES[0]}-ascat -m {input} --retry-amount 3"
+    """
+    mkdir -p {RAWDIR}/{TISSUE}-{TTYPE}-ascat
+    ./bin/gdc-client download -d {RAWDIR}/{TISSUE}-{TTYPE}-ascat -m {input} --retry-amount 3
+    """
+    Rscript src/getMatrix.R {TISSUE} {TTYPE} {DATADIR} {RAWDIR}
+    """
 
 rule get_manifest:
   output:
-    expand(MDIR+"{tissue}-{tts}-{fts}.txt", tissue=TISSUE, tts=TTYPES, fts=FTYPES)
-  run:
-    for tt in TTYPES:
-      shell("mkdir -p {MDIR} ; python src/queryGDC.py {TISSUE} {tt}")
+    ## Example: data/manifests/breast-tumor-ascat.txt"
+    MDIR+"/"+TISSUE+"-"+TTYPE+"-files.tsv",
+    expand(MDIR+"/"+TISSUE+"-"+TTYPE+"-{fts}.txt", fts=["ascat", "rna_counts"] )
+  shell:
+    "mkdir -p {MDIR} ; python src/queryGDC.py {TISSUE} {TTYPE} {MDIR} "
 
 rule clean:
   shell:
-    "rm -rf data"
+    "rm -rf {MDIR} {FIGDIR} {RAWDIR}"
