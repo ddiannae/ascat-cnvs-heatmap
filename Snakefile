@@ -1,13 +1,13 @@
 ## Snakefile for ASCAT2 files from GDC
 ##
 ## Tissue type just like in GDC, lowercase is fine
-TISSUE = "breast"
+TISSUE = "lung"
 ## Only tumor samples for the ascat pipeline. It takes normal and tumor for 
 ## comparison, so there are no normal samples.
 TTYPE = "tumor"
 ## The RNA files are added so that we get cases that include
 ## both files
-DATADIR = "data/"+TISSUE
+DATADIR = "/datos/ot/diana/cnvs/"+TISSUE
 FIGDIR = "figures/"+TISSUE
 MDIR = DATADIR+"/manifests"
 RAWDIR = DATADIR+"/raw"
@@ -37,7 +37,6 @@ rule download_files_and_get_ascat_matrix:
     """
     mkdir -p {RAWDIR}/{TISSUE}-{TTYPE}-ascat
     ./bin/gdc-client download -d {RAWDIR}/{TISSUE}-{TTYPE}-ascat -m {input} --retry-amount 3
-    """
     Rscript src/getMatrix.R {TISSUE} {TTYPE} {DATADIR} {RAWDIR}
     """
 
@@ -51,4 +50,4 @@ rule get_manifest:
 
 rule clean:
   shell:
-    "rm -rf {MDIR} {FIGDIR} {RAWDIR}"
+    "rm -rf {DATADIR} {FIGDIR}"

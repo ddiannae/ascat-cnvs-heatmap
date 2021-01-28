@@ -102,7 +102,7 @@ df = pd.merge(df_ascat, df_rna, "inner", on="cases.0.case_id",
         suffixes=("_ascat", "_rna"))
 
 # Save file ids and file names just in case
-df.to_csv(mdir + "-".join([primary_site.lower(), sst.lower()]) + "-files.tsv", sep="\t", index=False)  
+df.to_csv(mdir + "/" + "-".join([primary_site.lower(), sst.lower()]) + "-files.tsv", sep="\t", index=False)  
 
 # Getting RNASeq files manifest for future download
 params = { "ids" : df["id_rna"].tolist() }
@@ -111,7 +111,7 @@ response = requests.post(manifest_endpt, data= json.dumps(params), headers = {"C
 
 print("Got RNASeq manifest")
 
-f = open(mdir + "-".join([primary_site.lower(),
+f = open(mdir + "/" + "-".join([primary_site.lower(),
     sst.lower(), "rna_counts.txt"]), "w")
 f.write(response.content.decode("utf-8"))
 f.close()
@@ -125,7 +125,7 @@ response = requests.post(manifest_endpt, data= json.dumps(params), headers = {"C
 
 print("Got ASCAT2 manifest")
 
-f = open(mdir + "-".join([primary_site.lower(),
+f = open(mdir + "/" + "-".join([primary_site.lower(),
     sst.lower(), "ascat.txt"]), "w")
 f.write(response.content.decode("utf-8"))
 f.close()
