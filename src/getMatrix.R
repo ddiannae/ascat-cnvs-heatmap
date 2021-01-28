@@ -4,14 +4,24 @@ library(stringr)
 
 args <- commandArgs(trailingOnly = T)
 print(args)
-if (length(args) != 2) {
+datadir = "data"
+rawdir = paste(datadir, "raw", "/")
+if (length(args) < 2 ) {
   stop("Incorrect number of arguments", call.=FALSE)
 } else {
   tissue = args[1]
   type = args[2]
+  
+  if(!is.null(args[3])) {
+    datadir = args[3]
+  }
+  
+  if(!is.null(args[4])) {
+    rawdir = args[4] 
+  }
 }
 
-files_to_read <- list.files(path = paste0("./data/raw/", tissue, "-", type, "-ascat"), 
+files_to_read <- list.files(path = paste0(rawdir, "/", tissue, "-", type, "-ascat"), 
                             pattern = "\\.tsv$", full.names = T, recursive = T)
 
 all_files <- lapply(files_to_read, function(file) {
@@ -36,5 +46,5 @@ colnames(matrix) <- targets$id
 matrix <- matrix %>% mutate(ensembl_id = genes[,1]) %>% 
   select(ensembl_id, everything())
 
-write_tsv(matrix, paste0("./data/", tissue, "-", type, "-ascat-matrix.tsv"))
-write_tsv(targets, paste0("./data/", tissue, "-", type, "-ascat-files.tsv"))
+write_tsv(matrix, paste0(datadir, "/", tissue, "-", type, "-ascat-matrix.tsv"))
+write_tsv(targets, paste0(datadir,"/", tissue, "-", type, "-ascat-files.tsv"))
