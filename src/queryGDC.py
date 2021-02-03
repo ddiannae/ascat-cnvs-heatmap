@@ -74,11 +74,14 @@ params = {
 
 # Getting ASCAT2 data
 response = requests.get(files_endpt, params = params)
+print(params)
 data = response.content.decode("utf-8")
+print(data)
 
 print("ASCAT2 query done")
 
 df_ascat = pd.read_csv(StringIO(data), sep ="\t")
+df_ascat.drop_duplicates(subset=["cases.0.case_id"], inplace=True)
 
 # Change filters to get RNASeq Counts data
 filters["content"][2]["content"]["value"] = "HTSeq - Counts"
@@ -96,7 +99,7 @@ data = response.content.decode("utf-8")
 print("RNASeq query done")
 
 df_rna = pd.read_csv(StringIO(data), sep ="\t")
-
+df_rna.drop_duplicates(subset=["cases.0.case_id"], inplace=True)
 # We need cases that have both files
 df = pd.merge(df_ascat, df_rna, "inner", on="cases.0.case_id",
         suffixes=("_ascat", "_rna"))
