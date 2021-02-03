@@ -1,17 +1,17 @@
 ## Snakefile for ASCAT2 files from GDC
 ##
 ## Tissue type just like in GDC, lowercase is fine
-TISSUE = "lung"
+TISSUE = "colon"
 ## Only tumor samples for the ascat pipeline. It takes normal and tumor for 
 ## comparison, so there are no normal samples.
 TTYPE = "tumor"
 ## The RNA files are added so that we get cases that include
 ## both files
-DATADIR = "/datos/ot/diana/cnvs/"+TISSUE
+DATADIR = "data/"+TISSUE
 FIGDIR = "figures/"+TISSUE
 MDIR = DATADIR+"/manifests"
 RAWDIR = DATADIR+"/raw"
-biomart = "data/Biomart_Ensembl102_GRCh38_p13.txt"
+biomart = "input/Biomart_Ensembl102_GRCh38_p13.txt"
 
 rule get_heatmap:
   input: 
