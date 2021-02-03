@@ -7,3 +7,4 @@ packrat/src/*
 .Rhistory
 .Rprofile
 *~
+*.ipynb_checkpoints
