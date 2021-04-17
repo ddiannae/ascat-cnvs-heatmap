@@ -1,0 +1,33 @@
+## Snakefile for ASCAT2 files from GDC
+##
+## Tissue type just like in GDC, lowercase is fine
+TISSUES = ["ovary", "prostate", "pancreas", "bladder", "skin", "brain", "testis", "liver", "bone", "esophagus"]
+## Only tumor samples for the ascat pipeline. It takes normal and tumor for 
+## comparison, so there are no normal samples.
+TTYPE = "tumor"
+## The RNA files are added so that we get cases that include
+## both files
+DATADIR = "/datos/ot/diana/cnvs"
+FIGDIR = "figures"
+biomart = "input/Biomart_Ensembl102_GRCh38_p13.txt"
+manifests = [] 
+for t in TISSUES:
+  manifests.append(DATADIR+ "/" + t + "/manifests/" + t + "-tumor-files.tsv")
+  manifests.append(DATADIR+ "/" + t + "/manifests/" + t + "-tumor-ascat.txt")
+  manifests.append(DATADIR+ "/" + t + "/manifests/" + t + "-tumor-rna_counts.txt")
+
+rule all:
+  input:
+    manifests
+
+rule get_manifest:
+  output:
+    ## Example: data/breast/manifests/breast-tumor-ascat.txt"
+    DATADIR+"/{tissue}/manifests/{tissue}-{type}-files.tsv",
+    DATADIR+"/{tissue}/manifests/{tissue}-{type}-ascat.txt",
+    DATADIR+"/{tissue}/manifests/{tissue}-{type}-rna_counts.txt"
+  shell:
+    """
+    mkdir -p {DATADIR}/{wildcards.tissue}/manifests
+    python src/queryGDC.py {wildcards.tissue} {wildcards.type} {DATADIR}/{wildcards.tissue}/manifests 
+    """
