@@ -74,9 +74,7 @@ params = {
 
 # Getting ASCAT2 data
 response = requests.get(files_endpt, params = params)
-print(params)
 data = response.content.decode("utf-8")
-print(data)
 
 print("ASCAT2 query done")
 

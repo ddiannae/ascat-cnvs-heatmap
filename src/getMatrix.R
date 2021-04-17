@@ -3,25 +3,18 @@ library(dplyr)
 library(stringr)
 
 args <- commandArgs(trailingOnly = T)
-print(args)
-datadir = "data"
-rawdir = paste(datadir, "raw", "/")
-if (length(args) < 2 ) {
+
+if (length(args) < 3 ) {
   stop("Incorrect number of arguments", call.=FALSE)
 } else {
   tissue = args[1]
   type = args[2]
-  
-  if(!is.null(args[3])) {
-    datadir = args[3]
-  }
-  
-  if(!is.null(args[4])) {
-    rawdir = args[4] 
-  }
+  datadir = args[3]
 }
+datadir <- paste(datadir, tissue, sep="/")
+rawdir <- paste(datadir, "raw", paste0(tissue,"-", type, "-ascat"), sep="/")
 
-files_to_read <- list.files(path = paste0(rawdir, "/", tissue, "-", type, "-ascat"), 
+files_to_read <- list.files(path = rawdir, 
                             pattern = "\\.tsv$", full.names = T, recursive = T)
 
 all_files <- lapply(files_to_read, function(file) {
