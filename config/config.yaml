@@ -1,0 +1,11 @@
+tissues: [ovary, prostate, pancreas, bladder, skin, liver, esophagus, breast, lung, kidney, colorectal, uterus, thyroid]
+  #tissues: [ovary, prostate, pancreas, bladder, skin, brain, testis, liver, esophagus, breast, lung, kidney, colorectal, uterus, thyroid]
+## Only tumor samples for the ascat pipeline. It takes normal and tumor for
+### comparison, so there are no normal samples.
+#tissues: [testis]
+### The RNA files are added so that we get cases that include
+### both files
+datadir: /datos/ot/diana/llrc-cnvs
+figdir: figures
+biomart: /home/dgarcia/Workspace/cnv-pipeline/input/Biomart_Ensembl102_GRCh38_p13.txt
+aracne_singularity: /home/dgarcia/Workspace/aracne-singularity/aracne_multicore.sif

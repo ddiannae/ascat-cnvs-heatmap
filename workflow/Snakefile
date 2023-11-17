@@ -1,0 +1,124 @@
+## Snakefile for ASCAT2 files from GDC
+##
+## Tissue type just like in GDC, lowercase is fine
+configfile: "config/config.yaml"
+
+files=[]
+for t in config["tissues"]:
+  files.append(config["datadir"]+"/"+t+"/"+config["figdir"]+"/"+t+"-cancer-protein_coding-heatmap.png")
+  files.append(config["datadir"]+"/"+t+"/"+config["figdir"]+"/"+t+"-normal-protein_coding-heatmap.png")
+  files.append(config["datadir"]+"/"+t+"/cancer-interactions-100000.tsv")
+  files.append(config["datadir"]+"/"+t+"/cancer-interactions-100000.tsv")
+  files.append(config["datadir"]+"/"+t+"/normal-interactions-10000.tsv")
+  files.append(config["datadir"]+"/"+t+"/normal-interactions-10000.tsv")
+
+rule all:
+  input:
+    files 
+
+rule get_network_tables:
+    input:
+        mi_matrix=config["datadir"]+"/{tissue}/mi-{tissue}-{cond}.adj"
+    output:
+        interactions=config["datadir"]+"/{tissue}/{cond}-interactions-{cutoff}.tsv",
+        vertices=config["datadir"]+"/{tissue}/{cond}-vertices-{cutoff}.tsv"
+    params:
+        biomart=config["biomart"],
+        cutoff="{cutoff}",
+        cond="{cond}"
+    threads: 18 
+    log:
+        config["datadir"]+"/{tissue}/log/{cond}-network-table_{cutoff}.log"
+    script:
+        "getNetworkTables.R"
+
+rule aracne:
+    input:
+        config["datadir"]+"/{tissue}/{tissue}-{cond}-protein_coding.tsv"
+    output:
+        config["datadir"]+"/{tissue}/mi-{tissue}-{cond}.adj"
+    singularity:
+        config["aracne_singularity"]
+    params:
+        config["datadir"]+"/{tissue}",
+        "{cond}" 
+    threads: 16
+    log:
+        config["datadir"]+"/{tissue}/log/{tissue}-{cond}-aracne.log"
+    script:
+        "aracne_matrix.py"
+
+rule get_heatmap:
+  input: 
+    config["datadir"]+"/{tissue}/{tissue}-{cond}-ascat-matrix.tsv"
+  output:
+    heatmap=config["datadir"]+"/{tissue}/"+config["figdir"]+"/{tissue}-{cond}-protein_coding-heatmap.png",
+    pcmatrix=config["datadir"]+"/{tissue}/{tissue}-{cond}-protein_coding.tsv"
+  params:
+    biomart=config["biomart"]
+  threads:32
+  log: 
+    config["datadir"]+"/{tissue}/log/{tissue}-{cond}-ascat-heatmap.log"
+  script:
+    "getHeatmap.R" 
+
+## We need to run these two together because the output of the download_files
+## tasks depends on the manifest and there is no easy way to specify this on 
+## snakemake
+rule get_ascat_matrix:
+  input:
+    ## Manifest file
+    config["datadir"]+"/{tissue}/raw/{tissue}-{cond}-ascat/downloads_done.txt"
+  output: 
+    config["datadir"]+"/{tissue}/{tissue}-{cond}-ascat-matrix.tsv",
+    config["datadir"]+"/{tissue}/{tissue}-{cond}-ascat-files.tsv"
+  params: 
+    rawdir=config["datadir"]+"/{tissue}/raw/{tissue}-{cond}-ascat",
+    cond="{cond}",
+    tissue="{tissue}"
+  threads: 32
+  log: 
+    config["datadir"]+"/{tissue}/log/{tissue}-{cond}-ascat-matrix.log"
+  script:
+    "getMatrix.R"
+
+rule download_files:
+  input:
+    ## Manifest file
+    config["datadir"]+"/{tissue}/manifests/{tissue}-{cond}-ascat.txt",
+  output: 
+    directory(config["datadir"]+"/{tissue}/raw/{tissue}-{cond}-ascat"),
+    config["datadir"]+"/{tissue}/raw/{tissue}-{cond}-ascat/downloads_done.txt"
+  shell:
+    """
+    mkdir -p {output[0]} 
+    ./bin/gdc-client download -d {output[0]} -m {input[0]} --retry-amount 3
+    touch {output[1]}
+    """
+
+rule get_manifest:
+  output:
+    ## Example: data/breast/manifests/breast-tumor-ascat.txt"
+    config["datadir"]+"/{tissue}/manifests/{tissue}-{cond}-files.tsv",
+    config["datadir"]+"/{tissue}/manifests/{tissue}-{cond}-ascat.txt",
+  input:
+    config["datadir"]+"/{tissue}/"+config["figdir"]+"/done.txt"
+  params:
+    tissue="{tissue}",
+    cond="{cond}",
+  log:
+    config["datadir"]+"/{tissue}/log/{cond}_get_manifest.log"
+  script:
+    "scripts/queryGDC.py"
+
+rule setup_dirs:
+  output:
+    config["datadir"]+"/{tissue}/"+config["figdir"]+"/done.txt"
+  params:
+    config["datadir"]+"/{tissue}/"+config["figdir"],
+    config["datadir"]+"/{tissue}/log",
+  shell:
+    """
+    mkdir -p {params[0]} {params[1]}
+    touch {output[0]}
+    """ 
